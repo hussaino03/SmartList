@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+	<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+	<link rel="manifest" href="favicon/site.webmanifest">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>SmartList</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+
+<body>
+
+	<h1>SmartList</h1>
+	<div class="skill-bars">
+		<div class="bar">
+			<div class="info">
+				<span id='level-display-text' style='font-weight: bold;'>Loading...</span>
+      </div>
+      <div class="progress-line html">
+        <span id='barwidth'></span>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="document.getElementById('newtask-form').style.display='block'" style='font-size: 20px; font-weight: bold'>New Task</button><button onclick='loadCompletedTasks();'.style.display='block' style='font-size: 20px; font-weight: bold'>Show completed</button>
+    <button onclick='loadTasks();'.style.display='block' style='font-size: 20px; font-weight: bold'>Show to-do</button>
+    
+  <div id='newtask-form' class='modal'>
+    <form id="form" class='modal-content animate'>
+      <div class="imgcontainer">
+         <span onclick="document.getElementById('newtask-form').style.display='none'" class="close" title="Close Modal">&times;</span>
+         <h3>Make a new task!</h3>
+        <img src="https://img2.pngio.com/clipboard-icon-clipboard-icon-png-512_512.png">
+      <input type="text" name="input" placeholder="Add new task" id="nameinput">
+        <textarea name="input2" placeholder="Task description" id="descinput"></textarea>
+ <hr>
+        <div>
+          <span class='slider' style='bottom: 10px;'>Very easy</span>
+         <input type="range" min="1" max="100" value="50" id="difficultyinput" class='slider'>
+          <span class='slider' style='bottom: 10px;'>Very hard</span>
+      </div>
+        
+        <div>
+          <span class='slider' style='bottom: 10px;'>Not important</span>
+         <input type="range" min="1" max="100" value="50" id="importanceinput" class='slider'>
+          <span class='slider' style='bottom: 10px;'>Very important</span>
+      </div>
+        
+      <button type="submit">Press Enter or click to submit</button>
+      </div>
+    </form>
+  </div>
+
+  
+  
+  
+
+  <button id="clear-button">Clear all data</button>
+
+  <div class="main">
+    <h2 id='to-do-title'>To-do</h2>
+    <h2 id='completed-title'>Completed</h2>
+     <div class='modal-content elementToFadeInAndOut' id='level-up' style='display: none'>
+    <p style='font-size: 20px; color: black; margin: auto; text-align: center; padding: 10px 10px 10px 10px; font-weight: bold;' id='level-up-text'>Level up!</p>
+       </div>
+    <ul id="list">
+ 
+    </ul>
+ 
+  </div>
+  <script src="js/scripts.js"></script>
+</body>
+
+</html>
+</body>
+
+</html>
+    <script src="script.js"></script>
+    <script src="banner.js"></script>
+  </body>
+</html>
