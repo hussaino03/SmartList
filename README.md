@@ -12,7 +12,7 @@ The best part about the website is that it saves your data even when you leave t
 
 ### Technologies Used
 
-We built it using ```HTML, CSS, and JavaScript```
+We built it using ```HTML, CSS, and JavaScript``` (Mainly JS was used to build the points algorithms) 
 
 ➼ We first made the input elements and functionality
 
