@@ -2,7 +2,7 @@
 
 ### Inspiration
 
-As school students during the quarantine, we wanted to make something simple but useful for education. Our goal was to brainstorm something that could be used by students to supplement, help, or improve learning in any way. The inspiration finally came after we came up with the idea to make a special to-do list.
+As students during the quarantine, we wanted to make something simple but useful for education. Our goal was to brainstorm something that could be used by students to supplement, help, or improve learning in any way. The inspiration finally came after we came up with the idea to make a special to-do list.
 
 ### Functionality 
 
