@@ -24,7 +24,7 @@ We built it using ```HTML, CSS, and JavaScript``` (Mainly JS was used to build t
 
 ➼ Created functions to save data to localstorage for user data to be saved in the browser
 
-➼ Finally, we made the experience and leveling system
+➼ Implemented the experience and the leveling up system 
 
 ### Challenges 
 
