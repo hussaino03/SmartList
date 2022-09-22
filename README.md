@@ -20,7 +20,7 @@ We built it using ```HTML, CSS, and JavaScript``` (Mainly JS was used to build t
 
 ➼ Added functional buttons to the lists
 
-➼ Stored completed tasks
+➼ Stored completed/uncompleted tasks
 
 ➼ Created functions to save data to localstorage for user data to be saved in the browser
 
