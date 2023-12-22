@@ -12,7 +12,7 @@ The best part about the website is that it saves your data even when you leave t
 
 ### Technologies Used
 
-JavaScript was used for point algorithm, and HTML/CSS for the UI
+JavaScript was used for points algorithm, and HTML/CSS for the UI
 
 ➼ We first made the input elements and functionality
 
@@ -22,9 +22,9 @@ JavaScript was used for point algorithm, and HTML/CSS for the UI
 
 ➼ Stored completed/uncompleted tasks
 
-➼ Created functions to save data to localstorage for user data to be saved in the browser
+➼ Created functions to save data to local storage for user data to be saved in the browser
 
-➼ Implemented the experience and the leveling up system 
+➼ Implemented the experience and the levelling up system 
 
 ### Challenges 
 
