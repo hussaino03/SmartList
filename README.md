@@ -12,13 +12,13 @@ The best part about the website is that it saves your data even when you leave t
 
 ### Technologies Used
 
-We built it using ```HTML, CSS, and JavaScript``` (Mainly JS was used to build the points algorithms) 
+JavaScript was used for point algorithm, and HTML/CSS for the UI
 
 ➼ We first made the input elements and functionality
 
 ➼ Made the list functional with the ability to add items
 
-➼ Added functional buttons to the lists
+➼ Added functional buttons to the lists using CSS
 
 ➼ Stored completed/uncompleted tasks
 
@@ -29,7 +29,3 @@ We built it using ```HTML, CSS, and JavaScript``` (Mainly JS was used to build t
 ### Challenges 
 
 Syncing data with local storage, loading data on page load, and updating the page for task creation posed challenges.
-
-### Demonstration 
-
-[<img src="https://raw.githubusercontent.com/hussaino03/SmartList/main/Smart List.png" height="160em" align="center" alt="See The Demonstration Video!" title="See The Demonstration Video!"/>](https://youtu.be/PeCSn-go6QQ)
