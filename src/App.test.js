@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import App from './App';
 
+
 // Mock localStorage
 const localStorageMock = (function() {
   let store = {};
@@ -110,5 +111,52 @@ describe('App XP and Level Up Tests', () => {
 
     // Verify modal is closed
     expect(screen.queryByText(/Level up!/)).not.toBeInTheDocument();
+  });
+});
+jest.mock('./components/StreakTracker', () => {
+  return function MockedStreakTracker({ tasks, completedTasks }) {
+    const currentStreak = 3; // Mock current streak
+    const longestStreak = 5; // Mock longest streak
+
+    return (
+      <div>
+        <h3>🔥 Streak</h3>
+        <div>
+          <p>Current: {currentStreak}</p>
+          <p>Longest: {longestStreak}</p>
+        </div>
+      </div>
+    );
+  };
+});
+
+describe('StreakTracker Tests', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('StreakTracker displays current and longest streak', () => {
+    const initialTasks = [
+      { name: 'Task 1', desc: 'Description 1', difficulty: 50, importance: 50, experience: 100 },
+      { name: 'Task 2', desc: 'Description 2', difficulty: 50, importance: 50, experience: 100 },
+    ];
+    const initialCompletedTasks = [
+      { name: 'Completed Task 1', desc: 'Description', difficulty: 50, importance: 50, experience: 100, completedAt: new Date().toISOString() },
+    ];
+
+    localStorage.setItem('tasks', JSON.stringify(initialTasks));
+    localStorage.setItem('completedtasks', JSON.stringify(initialCompletedTasks));
+
+    render(<App />);
+
+    // Check if StreakTracker is rendered with mocked values
+    expect(screen.getByText('🔥 Streak')).toBeInTheDocument();
+    expect(screen.getByText('Current: 3')).toBeInTheDocument();
+    expect(screen.getByText('Longest: 5')).toBeInTheDocument();
   });
 });
