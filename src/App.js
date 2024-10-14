@@ -5,6 +5,7 @@ import TaskButtons from './components/TaskButtons';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import LevelUpModal from './components/LevelUpModal';
+import StreakTracker from './components/StreakTracker';
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
@@ -19,8 +20,13 @@ const App = () => {
     // Load tasks, completed tasks, level, and experience from localStorage
     const loadedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     const loadedCompletedTasks = JSON.parse(localStorage.getItem('completedtasks')) || [];
+  setCompletedTasks(loadedCompletedTasks.map(task => ({
+    ...task,
+    completedAt: task.completedAt || new Date().toISOString() // Fallback for old data
+  })));
     const loadedLevel = JSON.parse(localStorage.getItem('level')) || 1;
     const loadedExperience = JSON.parse(localStorage.getItem('experience')) || 0;
+    
 
     setTasks(loadedTasks);
     setCompletedTasks(loadedCompletedTasks);
@@ -36,7 +42,8 @@ const App = () => {
 
   const completeTask = (task) => {
     const updatedTasks = tasks.filter(t => t.name !== task.name);
-    const updatedCompletedTasks = [...completedTasks, task];
+    const completedTask = { ...task, completedAt: new Date().toISOString() };
+    const updatedCompletedTasks = [...completedTasks, completedTask];
     let newExperience = experience + task.experience;
     const experienceNeededToLevel = level * 200;
     let currentLevel = level;
@@ -61,6 +68,7 @@ const App = () => {
     localStorage.setItem('completedtasks', JSON.stringify(updatedCompletedTasks));
     localStorage.setItem('experience', JSON.stringify(newExperience));
     localStorage.setItem('level', JSON.stringify(currentLevel));
+    localStorage.setItem('completedtasks', JSON.stringify(updatedCompletedTasks));
   };
 
   const removeTask = (taskName, isCompleted) => {
@@ -87,6 +95,7 @@ const App = () => {
     <div>
       <Header />
       <ProgressBar level={level} experience={experience} />
+      <StreakTracker tasks={tasks} completedTasks={completedTasks} />
       <TaskButtons 
         showCompleted={showCompleted} 
         setShowCompleted={setShowCompleted}
