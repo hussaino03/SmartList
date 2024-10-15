@@ -62,4 +62,20 @@ describe('StreakTracker Component', () => {
     const currentStreakElement = screen.getByText('Current').nextElementSibling;
     expect(currentStreakElement).toHaveTextContent('2');
   });
+  test('calculates longest streak correctly', () => {
+    const completedTasks = [
+      { completedAt: '2023-05-15T10:00:00Z' }, // Today
+      { completedAt: '2023-05-14T10:00:00Z' }, // Yesterday
+      { completedAt: '2023-05-13T10:00:00Z' }, // 2 days ago
+      { completedAt: '2023-05-10T10:00:00Z' }, // 5 days ago
+      { completedAt: '2023-05-09T10:00:00Z' }, // 6 days ago
+      { completedAt: '2023-05-08T10:00:00Z' }, // 7 days ago
+      { completedAt: '2023-05-07T10:00:00Z' }, // 8 days ago
+    ];
+
+    render(<StreakTracker completedTasks={completedTasks} today={mockToday} />);
+    
+    const longestStreakElement = screen.getByText('Longest').nextElementSibling;
+    expect(longestStreakElement).toHaveTextContent('4');
+  });
 });
