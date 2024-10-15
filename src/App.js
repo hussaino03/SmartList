@@ -20,10 +20,6 @@ const App = () => {
     // Load tasks, completed tasks, level, and experience from localStorage
     const loadedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     const loadedCompletedTasks = JSON.parse(localStorage.getItem('completedtasks')) || [];
-  setCompletedTasks(loadedCompletedTasks.map(task => ({
-    ...task,
-    completedAt: task.completedAt || new Date().toISOString() // Fallback for old data
-  })));
     const loadedLevel = JSON.parse(localStorage.getItem('level')) || 1;
     const loadedExperience = JSON.parse(localStorage.getItem('experience')) || 0;
     
