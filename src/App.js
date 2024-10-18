@@ -37,12 +37,27 @@ const App = () => {
   };
 
   const completeTask = (task) => {
+    console.log('Before completion:', {
+      completedTasks: completedTasks.map(t => ({
+        completedAt: t.completedAt,
+        normalizedDate: new Date(t.completedAt).setHours(0, 0, 0, 0)
+      }))
+    });
+
     const updatedTasks = tasks.filter(t => t.name !== task.name);
     const completedTask = { ...task, completedAt: new Date().toISOString() };
     const updatedCompletedTasks = [...completedTasks, completedTask];
     let newExperience = experience + task.experience;
     const experienceNeededToLevel = level * 200;
     let currentLevel = level;
+
+    // Add this console.log AFTER adding the new completed task
+    console.log('After completion:', {
+      completedTasks: updatedCompletedTasks.map(t => ({
+        completedAt: t.completedAt,
+        normalizedDate: new Date(t.completedAt).setHours(0, 0, 0, 0)
+      }))
+    });
 
     setTasks(updatedTasks);
     setCompletedTasks(updatedCompletedTasks);

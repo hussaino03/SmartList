@@ -8,6 +8,7 @@ SmartList is a gamified productivity web application built with React. It helps 
 - Gamification: Earn XP and level up by completing tasks
 - Difficulty and importance ratings: Assign ratings to tasks to determine XP rewards
 - Progress tracking: Visual representation of current level and XP progress
+- Streak tracking: Tracks the current and longest streak 
 - Persistent storage: Tasks and progress are saved in local storage
 
 ## Live Demo
