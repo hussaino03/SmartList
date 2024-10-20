@@ -20,7 +20,6 @@ const App = () => {
   const [error, setError] = useState(null);
   const [currentView, setCurrentView] = useState('todo');
 
-  // Initialize XP Manager
   const {
     level,
     experience,
@@ -48,7 +47,8 @@ const App = () => {
         },
         body: JSON.stringify({ 
           sessionId,
-          xp: getTotalXP() // Send the correct total XP on initialization
+          xp: getTotalXP(),
+          level: level
         })
       });
 
@@ -60,7 +60,6 @@ const App = () => {
       localStorage.setItem('userId', data.userId);
       setUserId(data.userId);
 
-      // Load tasks from localStorage
       const loadedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
       const loadedCompletedTasks = JSON.parse(localStorage.getItem('completedtasks')) || [];
 
@@ -76,14 +75,14 @@ const App = () => {
 
   useEffect(() => {
     initializeUser();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const updateUserData = async () => {
       if (!userId) return;
 
       try {
-        const totalXP = getTotalXP(); // Get the correct total XP
+        const totalXP = getTotalXP();
         
         const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
           method: 'PUT',
@@ -91,7 +90,8 @@ const App = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            xp: totalXP, // Send the total XP, not just current level's experience
+            xp: totalXP,
+            level: level,
             tasksCompleted: completedTasks.length,
           }),
         });
@@ -106,7 +106,7 @@ const App = () => {
     };
 
     updateUserData();
-  }, [userId, experience, level, completedTasks]); // Added level as a dependenc
+  }, [userId, experience, level, completedTasks, getTotalXP]);
 
   const addTask = (newTask) => {
     try {
@@ -126,17 +126,14 @@ const App = () => {
       const completedTask = { ...task, completedAt: new Date().toISOString() };
       const updatedCompletedTasks = [...completedTasks, completedTask];
 
-      // Calculate XP using the XP Manager
-      const { newExperience, currentLevel, totalExperience } = calculateXP(task.experience);
+      calculateXP(task.experience);
 
       setTasks(updatedTasks);
       setCompletedTasks(updatedCompletedTasks);
 
-      // Update localStorage
       localStorage.setItem('tasks', JSON.stringify(updatedTasks));
       localStorage.setItem('completedtasks', JSON.stringify(updatedCompletedTasks));
 
-      // The XP Manager now handles persisting experience and level
 
     } catch (error) {
       console.error('Error completing task:', error);
@@ -166,9 +163,7 @@ const App = () => {
   };
 
   const clearAllData = async () => {
-    try {
-      const sessionId = localStorage.getItem('sessionId');
-      
+    try {      
       localStorage.removeItem('tasks');
       localStorage.removeItem('completedtasks');
       localStorage.removeItem('experience');
@@ -177,7 +172,7 @@ const App = () => {
       setTasks([]);
       setCompletedTasks([]);
       const { level: resetLevel, experience: resetExp } = resetXP();
-
+  
       if (userId) {
         const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
           method: 'PUT',
@@ -186,6 +181,7 @@ const App = () => {
           },
           body: JSON.stringify({
             xp: resetExp,
+            level: resetLevel, 
             tasksCompleted: 0,
           }),
         });
