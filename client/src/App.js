@@ -11,6 +11,8 @@ import StreakTracker from './components/StreakTracker';
 import Leaderboard from './components/Leaderboard';
 import useXPManager from './components/XPManager';
 
+const API_BASE_URL = 'https://smart-list-hjea.vercel.app/api';
+
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
@@ -41,7 +43,7 @@ const App = () => {
           localStorage.setItem('sessionId', sessionId);
         }
 
-        const response = await fetch('https://smart-list-server-ruddy.vercel.app/api/users', {
+        const response = await fetch(`${API_BASE_URL}/users`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -80,7 +82,7 @@ const App = () => {
 
       try {
         const totalXP = getTotalXP();
-        const url = `https://smart-list-server-ruddy.vercel.app/api/users/${userId}`;
+        const url = `${API_BASE_URL}/users/${userId}`;
         
         console.log('Updating user data:', { url, userId, xp: totalXP, level, tasksCompleted: completedTasks.length });
         
@@ -201,7 +203,7 @@ const App = () => {
       const { level: resetLevel, experience: resetExp } = resetXP();
   
       if (userId) {
-        const response = await fetch(`https://smart-list-server-ruddy.vercel.app/api/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

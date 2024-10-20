@@ -1,38 +1,27 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
 const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
-const port = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: ['https://smart-listapp.vercel.app', 'http://localhost:3000'],
+  origin: ['https://smart-listapp.vercel.app/', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
-}));app.use(express.json());
+}));
+app.use(express.json());
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
-
-let db;
+let cachedDb = null;
 
 async function connectToDatabase() {
-  try {
-    await client.connect();
-    db = client.db("usersDB");
-    console.log("Connected to MongoDB");
-    
-    // Ensure index on deviceFingerprint
-    await db.collection('users').createIndex({ deviceFingerprint: 1 }, { unique: true });
-  } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
-    process.exit(1);
+  if (cachedDb) {
+    return cachedDb;
   }
+  const client = await MongoClient.connect(process.env.MONGODB_URI);
+  const db = client.db("usersDB");
+  cachedDb = db;
+  return db;
 }
-
-connectToDatabase();
 
 app.post('/api/users', async (req, res) => {
   const { sessionId, xp, level } = req.body;
@@ -41,15 +30,13 @@ app.post('/api/users', async (req, res) => {
     return res.status(400).json({ error: 'Session ID is required' });
   }
 
-  console.log(`Received request for sessionId: ${sessionId}`);
-
   try {
+    const db = await connectToDatabase();
     const usersCollection = db.collection('users');
     
     let user = await usersCollection.findOne({ deviceFingerprint: sessionId });
     
     if (user) {
-      console.log(`Existing user found: ${user._id}`);
       return res.json({
         userId: user._id,
         exists: true,
@@ -59,7 +46,6 @@ app.post('/api/users', async (req, res) => {
       });
     }
 
-    // If no user found, create new one
     user = {
       _id: new ObjectId(),
       deviceFingerprint: sessionId,
@@ -69,7 +55,6 @@ app.post('/api/users', async (req, res) => {
     };
 
     await usersCollection.insertOne(user);
-    console.log(`Created new user: ${user._id}`);
 
     res.json({
       userId: user._id,
@@ -79,22 +64,11 @@ app.post('/api/users', async (req, res) => {
       tasksCompleted: user.tasksCompleted
     });
   } catch (error) {
-    if (error.code === 11000) {  // Duplicate key error
-      console.log(`Duplicate key error for sessionId: ${sessionId}`);
-      const existingUser = await db.collection('users').findOne({ deviceFingerprint: sessionId });
-      return res.json({
-        userId: existingUser._id,
-        exists: true,
-        xp: existingUser.xp,
-        level: existingUser.level,
-        tasksCompleted: existingUser.tasksCompleted
-      });
-    }
     console.error('Error in user creation/lookup:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-// User update endpoint
+
 app.put('/api/users/:id', async (req, res) => {
   const { xp, tasksCompleted, level } = req.body;
   
@@ -103,9 +77,10 @@ app.put('/api/users/:id', async (req, res) => {
   }
 
   try {
+    const db = await connectToDatabase();
     const usersCollection = db.collection('users');
     const result = await usersCollection.updateOne(
-      { _id: new ObjectId(req.params.id) },  // Convert string to ObjectId
+      { _id: new ObjectId(req.params.id) },
       { $set: { xp, tasksCompleted, level } }
     );
 
@@ -119,28 +94,22 @@ app.put('/api/users/:id', async (req, res) => {
     res.json({ message: 'User updated successfully' });
   } catch (error) {
     console.error('Error updating user:', error);
-    if (error instanceof MongoServerError && error.code === 11000) {
-      res.status(400).json({ error: 'Duplicate key error' });
-    } else {
-      res.status(500).json({ error: 'Internal server error' });
-    }
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
-// Leaderboard endpoint
+
 app.get('/api/leaderboard', async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
   
   try {
+    const db = await connectToDatabase();
     const usersCollection = db.collection('users');
     const leaderboard = await usersCollection.find()
       .sort({ xp: -1 })
       .skip(offset)
       .limit(limit)
       .toArray();
-
-      console.log('Leaderboard data:', leaderboard);  // Add this line
-
 
     res.json(leaderboard);
   } catch (error) {
@@ -149,6 +118,4 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
+const API_BASE_URL = 'https://smart-list-hjea.vercel.app/api';
+
+
 // Lists for generating usernames
 const adjectives = [
   'Happy', 'Clever', 'Brave', 'Wise', 'Swift', 'Calm', 'Bright', 'Noble',
@@ -60,7 +63,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    fetch('https://smart-list-server-ruddy.vercel.app/api/leaderboard')
+    fetch(`${API_BASE_URL}/leaderboard`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch leaderboard data');
