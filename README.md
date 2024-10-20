@@ -1,6 +1,6 @@
-# SmartList
+# QuestLog
 
-SmartList is a gamified productivity web application built with React and backed by a MongoDB database. It helps users manage their tasks while providing a rewarding experience through a level-up system and leaderboard competition.
+QuestLog is a gamified productivity web application built with React and backed by a MongoDB database. It helps users manage their tasks while providing a rewarding experience through a level-up system and leaderboard competition.
 
 ## Features
 
