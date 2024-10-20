@@ -1,17 +1,27 @@
-/*fade*/
+.main-content {
+  position: relative;
+  min-height: 200px; 
+}
+
+.view-container {
+  width: 100%;
+}
 .fade-enter {
   opacity: 0;
 }
+
 .fade-enter-active {
   opacity: 1;
-  transition: opacity 100ms ease-in;
+  transition: opacity 300ms ease-in;
 }
+
 .fade-exit {
   opacity: 1;
 }
+
 .fade-exit-active {
   opacity: 0;
-  transition: opacity 100ms ease-in;
+  transition: opacity 300ms ease-in;
 }
 .elementToFadeInAndOut {
   width: 200px;
