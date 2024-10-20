@@ -7,8 +7,11 @@ const { MongoClient, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: ['https://smart-listapp.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));app.use(express.json());
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
