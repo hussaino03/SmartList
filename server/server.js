@@ -16,115 +16,109 @@ const db = new sqlite3.Database('./users.db', (err) => {
   console.log('Connected to the users database.');
 });
 
+// Add level column to users table if it doesn't exist
+db.run(`ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1`, (err) => {
+  if (err) {
+    // Column might already exist, which is fine
+    console.log('Level column might already exist:', err.message);
+  }
+});
+
 // User creation/lookup endpoint
 app.post('/api/users', async (req, res) => {
-    const { sessionId } = req.body;
-    
-    if (!sessionId) {
-      return res.status(400).json({ error: 'Session ID is required' });
-    }
+  const { sessionId, xp, level } = req.body;
   
-    db.serialize(() => {
-      // First try to find existing user
-      db.get('SELECT * FROM users WHERE deviceFingerprint = ?', [sessionId], (err, user) => {
+  if (!sessionId) {
+    return res.status(400).json({ error: 'Session ID is required' });
+  }
+
+  db.serialize(() => {
+    // First try to find existing user
+    db.get('SELECT * FROM users WHERE deviceFingerprint = ?', [sessionId], (err, user) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+
+      if (user) {
+        // User exists, return existing user data
+        console.log('Returning existing user:', user.id);
+        return res.json({
+          userId: user.id,
+          exists: true,
+          xp: user.xp,
+          level: user.level,
+          tasksCompleted: user.tasksCompleted
+        });
+      }
+
+      // If no user found, create new one with transaction
+      db.run('BEGIN TRANSACTION');
+      
+      // Double-check no user exists (handle race condition)
+      db.get('SELECT id FROM users WHERE deviceFingerprint = ?', [sessionId], (err, existingUser) => {
         if (err) {
-          console.error('Database error:', err);
+          db.run('ROLLBACK');
           return res.status(500).json({ error: 'Internal server error' });
         }
-  
-        if (user) {
-          // User exists, return existing user data
-          console.log('Returning existing user:', user.id);
-          return res.json({
-            userId: user.id,
-            exists: true,
-            xp: user.xp,
-            tasksCompleted: user.tasksCompleted
-          });
-        }
-  
-        // If no user found, create new one with transaction
-        db.run('BEGIN TRANSACTION');
-        
-        // Double-check no user exists (handle race condition)
-        db.get('SELECT id FROM users WHERE deviceFingerprint = ?', [sessionId], (err, existingUser) => {
-          if (err) {
-            db.run('ROLLBACK');
-            return res.status(500).json({ error: 'Internal server error' });
-          }
-  
-          if (existingUser) {
-            db.run('ROLLBACK');
-            // User was created in the meantime, return that user
-            db.get('SELECT * FROM users WHERE id = ?', [existingUser.id], (err, user) => {
-              if (err) {
-                return res.status(500).json({ error: 'Internal server error' });
-              }
-              return res.json({
-                userId: user.id,
-                exists: true,
-                xp: user.xp,
-                tasksCompleted: user.tasksCompleted
-              });
-            });
-            return;
-          }
-  
-          // Create new user
-          const userId = uuidv4();
-          db.run(
-            'INSERT INTO users (id, deviceFingerprint, xp, tasksCompleted) VALUES (?, ?, 0, 0)',
-            [userId, sessionId],
-            function(err) {
-              if (err) {
-                db.run('ROLLBACK');
-                console.error('Error creating new user:', err);
-                return res.status(500).json({ error: 'Failed to create new user' });
-              }
-              
-              db.run('COMMIT');
-              console.log('Successfully created new user:', userId);
-              res.json({ 
-                userId: userId,
-                exists: false,
-                xp: 0,
-                tasksCompleted: 0
-              });
+
+        if (existingUser) {
+          db.run('ROLLBACK');
+          // User was created in the meantime, return that user
+          db.get('SELECT * FROM users WHERE id = ?', [existingUser.id], (err, user) => {
+            if (err) {
+              return res.status(500).json({ error: 'Internal server error' });
             }
-          );
-        });
+            return res.json({
+              userId: user.id,
+              exists: true,
+              xp: user.xp,
+              level: user.level,
+              tasksCompleted: user.tasksCompleted
+            });
+          });
+          return;
+        }
+
+        // Create new user
+        const userId = uuidv4();
+        db.run(
+          'INSERT INTO users (id, deviceFingerprint, xp, level, tasksCompleted) VALUES (?, ?, ?, ?, 0)',
+          [userId, sessionId, xp || 0, level || 1],
+          function(err) {
+            if (err) {
+              db.run('ROLLBACK');
+              console.error('Error creating new user:', err);
+              return res.status(500).json({ error: 'Failed to create new user' });
+            }
+            
+            db.run('COMMIT');
+            console.log('Successfully created new user:', userId);
+            res.json({ 
+              userId: userId,
+              exists: false,
+              xp: xp || 0,
+              level: level || 1,
+              tasksCompleted: 0
+            });
+          }
+        );
       });
     });
-  });
-
-
-// User lookup endpoint
-app.get('/api/users/:id', (req, res) => {
-  db.get('SELECT * FROM users WHERE id = ?', [req.params.id], (err, user) => {
-    if (err) {
-      return handleDbError(res, err);
-    }
-    if (!user) {
-      return res.status(404).json({ 
-        error: 'User not found',
-        code: 'USER_NOT_FOUND'
-      });
-    }
-    res.json(user);
   });
 });
 
 // User update endpoint
 app.put('/api/users/:id', (req, res) => {
-  const { xp, tasksCompleted } = req.body;
+  const { xp, tasksCompleted, level } = req.body;
   
-  if (typeof xp !== 'number' || typeof tasksCompleted !== 'number') {
-    return res.status(400).json({ error: 'Invalid xp or tasksCompleted value' });
+  if (typeof xp !== 'number' || typeof tasksCompleted !== 'number' || typeof level !== 'number') {
+    return res.status(400).json({ error: 'Invalid xp, tasksCompleted, or level value' });
   }
 
   db.run(
-    'UPDATE users SET xp = ?, tasksCompleted = ? WHERE id = ?',
-    [xp, tasksCompleted, req.params.id],
+    'UPDATE users SET xp = ?, tasksCompleted = ?, level = ? WHERE id = ?',
+    [xp, tasksCompleted, level, req.params.id],
     function(err) {
       if (err) {
         return handleDbError(res, err);
