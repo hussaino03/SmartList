@@ -13,7 +13,7 @@ const Task = ({ task, removeTask, completeTask, isCompleted }) => {
         {!isCompleted && (
           <button className="check" onClick={() => completeTask(task)}>✔️</button>
         )}
-        <button className="remove" onClick={() => removeTask(task.name, isCompleted)}>x</button>
+        <button className="remove" onClick={() => removeTask(task.id, isCompleted)}>x</button>
       </div>
       <div
         className="description"

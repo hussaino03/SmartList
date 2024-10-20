@@ -6,9 +6,9 @@ const TaskList = ({ tasks, removeTask, completeTask, isCompleted }) => {
     <div className="main">
       <h2>{isCompleted ? 'Completed' : 'To-do'}</h2>
       <ul id="list">
-        {tasks.map((task, index) => (
+        {tasks.map((task) => (
           <Task 
-            key={index} 
+            key={task.id} 
             task={task} 
             removeTask={removeTask} 
             completeTask={completeTask}

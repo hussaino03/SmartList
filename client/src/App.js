@@ -31,60 +31,60 @@ const App = () => {
     getTotalXP
   } = useXPManager();
 
-  const initializeUser = async () => {
-    try {
-      let sessionId = localStorage.getItem('sessionId');
-      
-      if (!sessionId) {
-        sessionId = uuidv4();
-        localStorage.setItem('sessionId', sessionId);
-      }
-  
-      const response = await fetch('http://localhost:5000/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          sessionId,
-          xp: getTotalXP(),
-          level: level
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to initialize user: ${response.status}`);
-      }
-
-      const data = await response.json();
-      localStorage.setItem('userId', data.userId);
-      setUserId(data.userId);
-
-      const loadedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-      const loadedCompletedTasks = JSON.parse(localStorage.getItem('completedtasks')) || [];
-
-      setTasks(loadedTasks);
-      setCompletedTasks(loadedCompletedTasks);
-
-    } catch (error) {
-      console.error('Error during initialization:', error);
-      setError(error.message);
-    }
-  };
-
-
   useEffect(() => {
-    initializeUser();
+    const initializeUser = async () => {
+      try {
+        let sessionId = localStorage.getItem('sessionId');
+        
+        if (!sessionId) {
+          sessionId = uuidv4();
+          localStorage.setItem('sessionId', sessionId);
+        }
+
+        const response = await fetch('http://localhost:5000/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            sessionId,
+            xp: getTotalXP(),
+            level: level
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to initialize user: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserId(data.userId);
+
+        // ... rest of the initialization logic
+      } catch (error) {
+        console.error('Error during initialization:', error);
+        setError(error.message);
+      }
+    };
+
+
+  initializeUser();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const updateUserData = async () => {
-      if (!userId) return;
+      if (!userId) {
+        console.log('No userId available, skipping update');
+        return;
+      }
 
       try {
         const totalXP = getTotalXP();
+        const url = `http://localhost:5000/api/users/${userId}`;
         
-        const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        console.log('Updating user data:', { url, userId, xp: totalXP, level, tasksCompleted: completedTasks.length });
+        
+        const response = await fetch(url, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -97,19 +97,46 @@ const App = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to update user data: ${response.status}`);
+          throw new Error(`Failed to update user data: ${response.status} ${response.statusText}`);
         }
+
+        const data = await response.json();
+        console.log('User data updated successfully:', data);
       } catch (error) {
         console.error('Error updating user data:', error);
-        setError(error.message);
+        setError(`Failed to update user data: ${error.message}`);
       }
     };
 
     updateUserData();
   }, [userId, experience, level, completedTasks, getTotalXP]);
 
-  const addTask = (newTask) => {
+
+  useEffect(() => {
+    const loadTasks = () => {
+      const storedTasks = localStorage.getItem('tasks');
+      const storedCompletedTasks = localStorage.getItem('completedtasks');
+      
+      if (storedTasks) {
+        setTasks(JSON.parse(storedTasks));
+      }
+      
+      if (storedCompletedTasks) {
+        setCompletedTasks(JSON.parse(storedCompletedTasks));
+      }
+    };
+
+    loadTasks();
+  }, []);
+
+  const addTask = (taskData) => {
     try {
+      const newTask = {
+        ...taskData,
+        id: uuidv4(),
+        createdAt: new Date().toISOString()
+      };
+      
       const updatedTasks = [...tasks, newTask];
       setTasks(updatedTasks);
       localStorage.setItem('tasks', JSON.stringify(updatedTasks));
@@ -122,8 +149,11 @@ const App = () => {
 
   const completeTask = (task) => {
     try {
-      const updatedTasks = tasks.filter(t => t.name !== task.name);
-      const completedTask = { ...task, completedAt: new Date().toISOString() };
+      const updatedTasks = tasks.filter(t => t.id !== task.id);
+      const completedTask = {
+        ...task,
+        completedAt: new Date().toISOString()
+      };
       const updatedCompletedTasks = [...completedTasks, completedTask];
 
       calculateXP(task.experience);
@@ -134,33 +164,30 @@ const App = () => {
       localStorage.setItem('tasks', JSON.stringify(updatedTasks));
       localStorage.setItem('completedtasks', JSON.stringify(updatedCompletedTasks));
 
-
     } catch (error) {
       console.error('Error completing task:', error);
       setError(error.message);
     }
   };
 
-  const removeTask = (taskName, isCompleted) => {
+  const removeTask = (taskId, isCompleted) => {
     try {
       if (isCompleted) {
-        const updatedCompletedTasks = completedTasks.filter(t => t.name !== taskName);
+        const updatedCompletedTasks = completedTasks.filter(t => t.id !== taskId);
         setCompletedTasks(updatedCompletedTasks);
         localStorage.setItem('completedtasks', JSON.stringify(updatedCompletedTasks));
       } else {
-        const updatedTasks = tasks.filter(t => t.name !== taskName);
+        const updatedTasks = tasks.filter(t => t.id !== taskId);
         setTasks(updatedTasks);
         localStorage.setItem('tasks', JSON.stringify(updatedTasks));
       }
-      console.log('Task removed successfully:', {
-        taskName,
-        isCompleted
-      });
+      console.log('Task removed successfully:', { taskId, isCompleted });
     } catch (error) {
       console.error('Error removing task:', error);
       setError(error.message);
     }
   };
+
 
   const clearAllData = async () => {
     try {      
@@ -234,33 +261,40 @@ const App = () => {
         </button>
         <button id="clear-button" onClick={clearAllData}>Clear all data</button>
       </div>
-      <SwitchTransition>
-        <CSSTransition
-          key={currentView}
-          classNames="fade"
-          timeout={100}
-        >
-          <div>
-            {currentView === 'leaderboard' && <Leaderboard />}
-            {currentView === 'todo' && (
-              <TaskList 
-                tasks={tasks} 
-                removeTask={removeTask}
-                completeTask={completeTask}
-                isCompleted={false}
-              />
-            )}
-            {currentView === 'completed' && (
-              <TaskList 
-                tasks={completedTasks} 
-                removeTask={removeTask}
-                completeTask={completeTask}
-                isCompleted={true}
-              />
-            )}
-          </div>
-        </CSSTransition>
-      </SwitchTransition>
+      
+      {/* Main content section */}
+      <div className="main-content">
+        <SwitchTransition mode="out-in">
+          <CSSTransition
+            key={currentView}
+            classNames="fade"
+            timeout={300}
+            unmountOnExit
+          >
+            <div className="view-container">
+              {currentView === 'leaderboard' && <Leaderboard />}
+              {currentView === 'todo' && (
+                <TaskList 
+                  tasks={tasks} 
+                  removeTask={removeTask}
+                  completeTask={completeTask}
+                  isCompleted={false}
+                />
+              )}
+              {currentView === 'completed' && (
+                <TaskList 
+                  tasks={completedTasks} 
+                  removeTask={removeTask}
+                  completeTask={completeTask}
+                  isCompleted={true}
+                />
+              )}
+            </div>
+          </CSSTransition>
+        </SwitchTransition>
+      </div>
+
+      {/* Level up modal */}
       <LevelUpModal 
         show={showLevelUp} 
         onClose={() => setShowLevelUp(false)} 

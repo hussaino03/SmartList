@@ -31,12 +31,10 @@ const generateUsername = (userId) => {
   
   return `${adjectives[adjIndex]}${nouns[nounIndex]}${number}`;
 };
-
 const LeaderboardEntry = ({ user, index }) => {
   const [showDetails, setShowDetails] = useState(false);
   
-  // Generate consistent username for this user
-  const username = useMemo(() => generateUsername(user.id), [user.id]);
+  const username = useMemo(() => generateUsername(user?._id), [user?._id]);
 
   return (
     <li>
@@ -50,9 +48,9 @@ const LeaderboardEntry = ({ user, index }) => {
         className="description"
         style={{ maxHeight: showDetails ? '200px' : '0', overflow: 'hidden' }}
       >
-        <p>XP: {user.xp}</p>
-        <p>Tasks Completed: {user.tasksCompleted}</p>
-        <p>Level: {user.level}</p>
+        <p>XP: {user?.xp || 0}</p>
+        <p>Tasks Completed: {user?.tasksCompleted || 0}</p>
+        <p>Level: {user?.level || 1}</p>
       </div>
     </li>
   );
@@ -60,7 +58,6 @@ const LeaderboardEntry = ({ user, index }) => {
 
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/leaderboard')
@@ -70,23 +67,21 @@ const Leaderboard = () => {
         }
         return response.json();
       })
-      .then(data => setLeaderboard(data))
+      .then(data => {
+        console.log('Leaderboard data:', data);  // This will only show in browser console
+        setLeaderboard(data);
+      })
       .catch(error => {
-        console.error('Error:', error);
-        setError(error.message);
+        console.error('Error:', error);  // This will only show in browser console
       });
   }, []);
-
-  if (error) {
-    return <div className="error">Error loading leaderboard: {error}</div>;
-  }
 
   return (
     <div className="leaderboard">
       <h2>Leaderboard</h2>
       <ul>
         {leaderboard.map((user, index) => (
-          <LeaderboardEntry key={user.id} user={user} index={index} />
+          <LeaderboardEntry key={user._id} user={user} index={index} />
         ))}
       </ul>
     </div>
