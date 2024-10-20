@@ -60,7 +60,7 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/leaderboard')
+    fetch('https://smart-list-server-ruddy.vercel.app/api/leaderboard')
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch leaderboard data');

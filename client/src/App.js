@@ -41,7 +41,7 @@ const App = () => {
           localStorage.setItem('sessionId', sessionId);
         }
 
-        const response = await fetch('http://localhost:5000/api/users', {
+        const response = await fetch('https://smart-list-server-ruddy.vercel.app/api/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ const App = () => {
 
       try {
         const totalXP = getTotalXP();
-        const url = `http://localhost:5000/api/users/${userId}`;
+        const url = `https://smart-list-server-ruddy.vercel.app/api/users/${userId}`;
         
         console.log('Updating user data:', { url, userId, xp: totalXP, level, tasksCompleted: completedTasks.length });
         
@@ -201,7 +201,7 @@ const App = () => {
       const { level: resetLevel, experience: resetExp } = resetXP();
   
       if (userId) {
-        const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        const response = await fetch(`https://smart-list-server-ruddy.vercel.app/api/users/${userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
