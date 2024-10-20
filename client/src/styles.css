@@ -1,4 +1,18 @@
 /*fade*/
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 100ms ease-in;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 100ms ease-in;
+}
 .elementToFadeInAndOut {
   width: 200px;
   height: 200px;
@@ -41,7 +55,8 @@ body {
 h2 {
   text-align: center;
   margin: auto;
-  padding-left: 125px;
+  padding-left: 0; 
+  width: 100%; 
 }
 
 button {
@@ -465,4 +480,94 @@ img {
     margin: 2px;
   }
   
+}
+/* leaderboard */
+.leaderboard {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.bottom-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.leaderboard-toggle {
+  margin-right: 10px;
+  color: green;
+  font-weight: bold;
+  font-size: 1.4em;
+  background-color: white;
+}
+
+#clear-button {
+  float: none;
+  margin: 0;
+}
+
+.leaderboard-toggle,
+#clear-button {
+  padding: 0.4rem 0.75rem;
+  font-size: 1.4rem;
+  background: white;
+  border: 3px solid #333;
+  box-shadow: 4px 4px #77dd77;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.leaderboard-toggle:hover,
+#clear-button:hover {
+  position: relative;
+  left: 4px;
+  top: 4px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .bottom-buttons {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .leaderboard-toggle {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .leaderboard-toggle,
+  #clear-button {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .leaderboard-toggle,
+  #clear-button {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .bottom-buttons {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    flex-direction: column;
+  }
+
+  .leaderboard-toggle {
+    margin-bottom: 5px;
+  }
+
+  .leaderboard-toggle,
+  #clear-button {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+  }
 }
