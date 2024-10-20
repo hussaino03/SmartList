@@ -1,6 +1,6 @@
 # SmartList
 
-SmartList is a gamified productivity web application built with React. It helps users manage their tasks while providing a rewarding experience through a level-up system.
+SmartList is a gamified productivity web application built with React and backed by a MongoDB database. It helps users manage their tasks while providing a rewarding experience through a level-up system and leaderboard competition.
 
 ## Features
 
@@ -9,11 +9,19 @@ SmartList is a gamified productivity web application built with React. It helps 
 - Difficulty and importance ratings: Assign ratings to tasks to determine XP rewards
 - Progress tracking: Visual representation of current level and XP progress
 - Streak tracking: Tracks the current and longest streak 
-- Persistent storage: Tasks and progress are saved in local storage
+- Leaderboard: Compare your progress with other users
+- Persistent storage: Tasks and progress are saved in MongoDB and synced across devices
+- User identification: Unique session IDs for user tracking without login
 
 ## Live Demo
 
 Check out the live demo of SmartList [here](https://smart-listapp.vercel.app/).
+
+## Architecture
+
+- Frontend: React application hosted on Vercel
+- Backend: Express.js server hosted on Vercel
+- Database: MongoDB
 
 ## Getting Started
 
@@ -21,6 +29,7 @@ Check out the live demo of SmartList [here](https://smart-listapp.vercel.app/).
 
 - Node.js (v14.0.0 or later)
 - npm (v6.0.0 or later)
+- MongoDB account and database
 
 ### Installation
 
@@ -28,35 +37,42 @@ Check out the live demo of SmartList [here](https://smart-listapp.vercel.app/).
    ```
    git clone https://github.com/hussaino03/SmartList.git
    ```
-
 2. Navigate to the project directory:
    ```
    cd SmartList
    ```
-
-3. Install dependencies:
+3. Install dependencies for both frontend and backend:
    ```
    npm install
+   cd server && npm install
    ```
-
-4. Start the development server:
+4. Set up environment variables:
+   - Create a `.env` file in the root directory
+   - Add your MongoDB connection string: `MONGODB_URI=your_mongodb_connection_string`
+5. Start the development server:
    ```
-   npm start
+   npm run dev
    ```
-
-5. Open your browser and visit `http://localhost:3000` to see the app running.
+6. Open your browser and visit `http://localhost:3000` to see the app running.
 
 ## Usage
 
-1. Click on "New Task" to add a new task.
-2. Fill in the task details, including name, description, difficulty, and importance.
-3. Click on the checkmark (✔️) next to a task to complete it and earn XP.
-4. Watch your progress bar fill up as you complete tasks and level up!
+1. Open the app in your browser. A unique session ID will be generated for you.
+2. Click on "New Task" to add a new task.
+3. Fill in the task details, including name, description, difficulty, and importance.
+4. Click on the checkmark (✔️) next to a task to complete it and earn XP.
+5. Watch your progress bar fill up as you complete tasks and level up!
+6. Check the leaderboard to see how you compare to other users.
+
+## API Endpoints
+
+- `POST /api/users`: Create or retrieve a user
+- `PUT /api/users/:id`: Update user data (XP, level, tasks completed)
+- `GET /api/leaderboard`: Retrieve leaderboard data
 
 ## Testing
 
 Run the test suite with:
-
 ```
 npm test
 ```
@@ -64,7 +80,9 @@ npm test
 ## Built With
 
 - [React](https://reactjs.org/) - The web framework used
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) - For unit testing
+- [Express.js](https://expressjs.com/) - Backend framework
+- [MongoDB](https://www.mongodb.com/) - Database
+- [Vercel](https://vercel.com/) - Hosting platform
 
 ## Contributing
 
