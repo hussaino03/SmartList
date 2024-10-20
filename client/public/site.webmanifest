@@ -1,6 +1,6 @@
 {
-    "name": "SmartList",
-    "short_name": "SmartList",
+    "name": "QuestLog",
+    "short_name": "QuestLog",
     "icons": [
       {
         "src": "/favicon/favicon-192x192.png",

@@ -35,7 +35,7 @@ Check out the live demo of QuestLog [here](https://smart-listapp.vercel.app/).
 
 1. Clone the repository:
    ```
-   git clone https://github.com/hussaino03/SmartList.git
+   git clone https://github.com/hussaino03/QuestLog.git
    ```
 2. Navigate to the project directory:
    ```
@@ -94,5 +94,5 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-- Thanks to all contributors who have helped shape SmartList.
+- Thanks to all contributors who have helped shape QuestLog.
 - Inspired by productivity apps and RPG games.
